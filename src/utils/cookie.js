@@ -92,7 +92,17 @@ export function isAllowedHost (referrer) {
   try {
     const url = new URL(referrer)
     const hostname = url.hostname.toLowerCase()
-    return config.meting.cookie.allowHosts.includes(hostname)
+    
+    for (const allowedHost of config.meting.cookie.allowHosts) {
+      // 精确匹配
+      if (allowedHost === hostname) return true
+      // 泛域名匹配（以 *.开头）
+      if (allowedHost.startsWith('*.')) {
+        const baseDomain = allowedHost.slice(1)
+        if (hostname.endsWith(baseDomain)) return true
+      }
+    }
+    return false
   } catch (error) {
     return false
   }
